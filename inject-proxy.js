@@ -52,5 +52,9 @@ http.createServer((req, res) => {
       res.end(body);
     });
   });
+  p.on("error", () => {
+    res.writeHead(502);
+    res.end("upstream not ready");
+  });
   req.pipe(p);
 }).listen(3001, "::");
