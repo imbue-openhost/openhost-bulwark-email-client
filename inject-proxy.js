@@ -53,4 +53,4 @@ http.createServer((req, res) => {
     });
   });
   req.pipe(p);
-}).listen(3001, "127.0.0.1");
+}).listen(3001, "::");
