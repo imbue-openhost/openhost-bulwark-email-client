@@ -4,20 +4,17 @@ const http = require("http");
 
 const SCRIPT = `<script>
 (function(){
-  console.log("[auto-login] path="+location.pathname);
   if(!location.pathname.includes("/login"))return;
   var u=sessionStorage.getItem("_alu");
   var p=sessionStorage.getItem("_alp");
-  console.log("[auto-login] creds="+(u?"yes":"no"));
   if(!u||!p)return;
   sessionStorage.removeItem("_alu");
   sessionStorage.removeItem("_alp");
   var iv=setInterval(function(){
     var e=document.getElementById("username");
     var pw=document.getElementById("password");
-    if(!e||!pw){console.log("[auto-login] waiting for form...");return;}
+    if(!e||!pw)return;
     clearInterval(iv);
-    console.log("[auto-login] found form, filling");
     var s=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
     s.call(e,u);e.dispatchEvent(new Event("input",{bubbles:true}));
     s.call(pw,p);pw.dispatchEvent(new Event("input",{bubbles:true}));

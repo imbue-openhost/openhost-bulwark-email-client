@@ -34,11 +34,8 @@ test.describe("Owner auth flow", () => {
       timeout: 30_000,
     });
 
-    // Verify we're in the inbox
-    await page.waitForLoadState("networkidle");
-    await page.screenshot({ path: "tests/owner-inbox.png", fullPage: true });
-
     // Should see mailbox UI elements
-    await expect(page.getByText("Inbox")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("button", { name: "Inbox" })).toBeVisible({ timeout: 15_000 });
+    await page.screenshot({ path: "tests/owner-inbox.png", fullPage: true });
   });
 });
