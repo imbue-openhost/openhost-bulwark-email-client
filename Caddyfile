@@ -10,6 +10,7 @@
 	handle {
 		reverse_proxy localhost:3000 {
 			header_down -Content-Security-Policy
+			header_down -X-Frame-Options
 		}
 	}
 }
