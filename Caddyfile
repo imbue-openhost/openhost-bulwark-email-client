@@ -6,6 +6,10 @@
 		file_server
 	}
 
-	# Everything else goes to Bulwark
-	reverse_proxy localhost:3000
+	# Proxy to Bulwark, strip frame-ancestors CSP so the iframe auto-login works
+	handle {
+		reverse_proxy localhost:3000 {
+			header_down -Content-Security-Policy
+		}
+	}
 }

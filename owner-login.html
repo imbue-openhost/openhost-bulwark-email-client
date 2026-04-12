@@ -4,43 +4,64 @@
 <style>body{font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8fafc}p{color:#64748b}</style>
 </head>
 <body>
-<p>Signing in...</p>
-<iframe id="f" src="/en/login" style="position:absolute;left:-9999px;width:1px;height:1px"></iframe>
+<p id="status">Signing in...</p>
+<iframe id="f" src="/en/login" style="position:absolute;left:-9999px;width:400px;height:600px"></iframe>
 <script>
 const JMAP_USER = "owner";
 const JMAP_PASS = "openhost-owner-email";
 
-document.getElementById("f").addEventListener("load", function() {
-  const doc = this.contentDocument;
+const iframe = document.getElementById("f");
+
+iframe.addEventListener("load", function onLoad() {
+  let doc;
+  try { doc = iframe.contentDocument; } catch(e) { return; }
+  if (!doc) return;
+
+  // Poll for the React form to render
   const poll = setInterval(() => {
-    const e = doc.getElementById("email");
-    const p = doc.getElementById("password");
+    let e, p;
+    try {
+      e = doc.getElementById("email");
+      p = doc.getElementById("password");
+    } catch(err) { clearInterval(poll); return; }
     if (!e || !p) return;
     clearInterval(poll);
 
     // React-compatible input setter
     const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+
     set.call(e, JMAP_USER);
     e.dispatchEvent(new Event("input", {bubbles: true}));
+    e.dispatchEvent(new Event("change", {bubbles: true}));
+
     set.call(p, JMAP_PASS);
     p.dispatchEvent(new Event("input", {bubbles: true}));
+    p.dispatchEvent(new Event("change", {bubbles: true}));
 
     setTimeout(() => {
-      const btn = doc.querySelector('button[type="submit"]');
-      if (btn) btn.click();
+      try {
+        const btn = doc.querySelector('button[type="submit"]') ||
+                    Array.from(doc.querySelectorAll("button")).find(b => b.textContent.includes("Sign in"));
+        if (btn) btn.click();
+      } catch(err) {}
 
-      // Wait for login to succeed (URL changes away from /login)
+      // Wait for navigation away from login
       const wait = setInterval(() => {
         try {
-          if (!this.contentWindow.location.pathname.includes("login")) {
+          const path = iframe.contentWindow.location.pathname;
+          if (path && !path.includes("login")) {
             clearInterval(wait);
             window.location.href = "/en";
           }
-        } catch(err) { clearInterval(wait); window.location.href = "/en"; }
-      }, 300);
-    }, 300);
-  }, 200);
-}.bind(document.getElementById("f")));
+        } catch(err) {
+          // cross-origin or navigation error - likely succeeded
+          clearInterval(wait);
+          window.location.href = "/en";
+        }
+      }, 500);
+    }, 500);
+  }, 300);
+});
 </script>
 </body>
 </html>
