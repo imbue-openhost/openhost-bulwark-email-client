@@ -14,11 +14,16 @@ const SCRIPT = `<script>
     var e=document.getElementById("username");
     var pw=document.getElementById("password");
     if(!e||!pw)return;
+    // Wait for React hydration
+    var rk=Object.keys(e).find(function(k){return k.startsWith("__reactFiber$")||k.startsWith("__reactInternalInstance$")});
+    if(!rk)return;
     clearInterval(iv);
     function fill(el,val){
-      el.focus();
-      el.value="";
-      document.execCommand("insertText",false,val);
+      var t=el._valueTracker;
+      if(t)t.setValue("");
+      var s=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
+      s.call(el,val);
+      el.dispatchEvent(new Event("input",{bubbles:true}));
     }
     fill(e,u);
     fill(pw,p);
