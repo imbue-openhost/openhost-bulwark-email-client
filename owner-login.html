@@ -1,55 +1,46 @@
 <!DOCTYPE html>
 <html>
-<head><title>Signing in...</title></head>
+<head><title>Signing in...</title>
+<style>body{font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8fafc}p{color:#64748b}</style>
+</head>
 <body>
 <p>Signing in...</p>
+<iframe id="f" src="/en/login" style="position:absolute;left:-9999px;width:1px;height:1px"></iframe>
 <script>
-(async () => {
-  const serverUrl = "https://email.host.zackpolizzi.com";
-  const username = "owner";
-  const accountId = username + "@" + serverUrl.replace("https://","");
+const JMAP_USER = "owner";
+const JMAP_PASS = "openhost-owner-email";
 
-  // Pre-seed Bulwark's localStorage auth state
-  localStorage.setItem("auth-storage", JSON.stringify({
-    state: {
-      serverUrl,
-      username,
-      authMode: "basic",
-      rememberMe: false,
-      activeAccountId: accountId
-    },
-    version: 0
-  }));
+document.getElementById("f").addEventListener("load", function() {
+  const doc = this.contentDocument;
+  const poll = setInterval(() => {
+    const e = doc.getElementById("email");
+    const p = doc.getElementById("password");
+    if (!e || !p) return;
+    clearInterval(poll);
 
-  localStorage.setItem("account-registry", JSON.stringify({
-    state: {
-      accounts: [{
-        label: username,
-        serverUrl,
-        username,
-        authMode: "basic",
-        rememberMe: false,
-        displayName: username,
-        email: username,
-        lastLoginAt: Date.now(),
-        isConnected: true,
-        hasError: false,
-        isDefault: true,
-        id: accountId,
-        cookieSlot: 0,
-        avatarColor: "#3b82f6"
-      }],
-      activeAccountId: accountId,
-      defaultAccountId: accountId
-    },
-    version: 0
-  }));
+    // React-compatible input setter
+    const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+    set.call(e, JMAP_USER);
+    e.dispatchEvent(new Event("input", {bubbles: true}));
+    set.call(p, JMAP_PASS);
+    p.dispatchEvent(new Event("input", {bubbles: true}));
 
-  localStorage.setItem("webmail_usernames", JSON.stringify([username]));
+    setTimeout(() => {
+      const btn = doc.querySelector('button[type="submit"]');
+      if (btn) btn.click();
 
-  // Redirect to inbox
-  window.location.href = "/en";
-})();
+      // Wait for login to succeed (URL changes away from /login)
+      const wait = setInterval(() => {
+        try {
+          if (!this.contentWindow.location.pathname.includes("login")) {
+            clearInterval(wait);
+            window.location.href = "/en";
+          }
+        } catch(err) { clearInterval(wait); window.location.href = "/en"; }
+      }, 300);
+    }, 300);
+  }, 200);
+}.bind(document.getElementById("f")));
 </script>
 </body>
 </html>
