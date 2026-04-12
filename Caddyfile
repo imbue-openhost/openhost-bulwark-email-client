@@ -1,4 +1,7 @@
 :4000 {
+	# Redirect root to auto-login
+	redir / /owner-login temporary
+
 	# Serve auto-login page for the owner
 	handle /owner-login {
 		root * /app/static
