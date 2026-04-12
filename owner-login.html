@@ -21,7 +21,7 @@ iframe.addEventListener("load", function onLoad() {
   const poll = setInterval(() => {
     let e, p;
     try {
-      e = doc.getElementById("email");
+      e = doc.getElementById("username");
       p = doc.getElementById("password");
     } catch(err) { clearInterval(poll); return; }
     if (!e || !p) return;
