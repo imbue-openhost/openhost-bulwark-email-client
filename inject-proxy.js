@@ -51,6 +51,8 @@ http.createServer((req, res) => {
       const h = { ...pr.headers };
       h["content-length"] = Buffer.byteLength(body);
       delete h["transfer-encoding"];
+      delete h["content-security-policy"];
+      delete h["x-frame-options"];
       res.writeHead(pr.statusCode, h);
       res.end(body);
     });
