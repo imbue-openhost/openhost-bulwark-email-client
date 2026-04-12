@@ -14,7 +14,7 @@ test.use({
 
 test.describe("Bulwark webmail + Stalwart JMAP", () => {
   test("login page loads", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/en/login");
     await expect(page.getByText("Sign in to your account")).toBeVisible();
     await expect(emailInput(page)).toBeVisible();
     await expect(passInput(page)).toBeVisible();
@@ -49,8 +49,6 @@ test.describe("Bulwark webmail + Stalwart JMAP", () => {
     await expect(page.getByText("Sign in to your account")).not.toBeVisible({
       timeout: 15_000,
     });
-    await expect(
-      page.getByRole("button", { name: "Inbox" })
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("Folders")).toBeVisible({ timeout: 15_000 });
   });
 });

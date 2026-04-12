@@ -7,7 +7,14 @@ test("/owner-login creates session and shows inbox", async ({ page }) => {
 
   await page.goto("/owner-login");
 
-  await expect(page.getByRole("button", { name: "Inbox" })).toBeVisible({
-    timeout: 20_000,
-  });
+  // Inbox UI loads — check for the welcome banner or Folders heading
+  await expect(page.getByText("Folders")).toBeVisible({ timeout: 20_000 });
+});
+
+test("visiting / auto-redirects to inbox when no cookie", async ({ page }) => {
+  await page.setExtraHTTPHeaders({ Authorization: `Bearer ${TOKEN}` });
+
+  await page.goto("/");
+
+  await expect(page.getByText("Folders")).toBeVisible({ timeout: 25_000 });
 });
