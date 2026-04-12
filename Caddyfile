@@ -1,0 +1,11 @@
+:4000 {
+	# Serve auto-login page for the owner
+	handle /owner-login {
+		root * /app/static
+		rewrite * /owner-login.html
+		file_server
+	}
+
+	# Everything else goes to Bulwark
+	reverse_proxy localhost:3000
+}
