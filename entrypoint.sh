@@ -1,11 +1,11 @@
 #!/bin/sh
 set -e
 
-# Start inject proxy (auto-login script injection, :3001 -> :3000)
-node /app/inject-proxy.js &
+# Owner-login handler (:3001)
+node /app/owner-login.js &
 
-# Start Caddy (:4000 -> :3001)
+# Caddy reverse proxy (:4000 -> :3000 + :3001)
 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
 
-# Start Bulwark (:3000)
+# Bulwark (:3000)
 exec node /app/server.js

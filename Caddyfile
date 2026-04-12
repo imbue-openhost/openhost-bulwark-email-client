@@ -1,21 +1,18 @@
 :4000 {
-	# Redirect /login to auto-login, but only if not already in the flow
-	@needs_auto_login {
+	# Auto-login handler (creates Bulwark session cookie, redirects to inbox)
+	@login_redirect {
 		path /login
-		not header Cookie *_al=1*
+		not header Cookie *jmap_session*
 	}
-	redir @needs_auto_login /owner-login temporary
+	redir @login_redirect /owner-login temporary
 
-	# Serve auto-login page
+	# Owner-login via session API
 	handle /owner-login {
-		header Set-Cookie "_al=1; Path=/; Max-Age=60"
-		root * /app/static
-		rewrite * /owner-login.html
-		file_server
+		reverse_proxy localhost:3001
 	}
 
-	# Proxy to Bulwark via inject-proxy
+	# Everything else to Bulwark
 	handle {
-		reverse_proxy localhost:3001
+		reverse_proxy localhost:3000
 	}
 }

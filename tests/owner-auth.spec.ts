@@ -23,19 +23,15 @@ test.describe("Owner auth flow", () => {
     expect(data.username).toContain("owner");
   });
 
-  test("owner-login auto-fills and logs into webmail", async ({ page }) => {
-    // Simulate OpenHost auth with Bearer token
+  test("/owner-login creates session and redirects to inbox", async ({
+    page,
+  }) => {
     await page.setExtraHTTPHeaders({ Authorization: `Bearer ${TOKEN}` });
-
     await page.goto("/owner-login");
 
-    // Should eventually end up in the inbox (not login page)
-    await page.waitForURL((url) => !url.pathname.includes("login"), {
-      timeout: 30_000,
+    // Should end up in the inbox
+    await expect(page.getByRole("button", { name: "Inbox" })).toBeVisible({
+      timeout: 20_000,
     });
-
-    // Should see mailbox UI elements
-    await expect(page.getByRole("button", { name: "Inbox" })).toBeVisible({ timeout: 15_000 });
-    await page.screenshot({ path: "tests/owner-inbox.png", fullPage: true });
   });
 });
