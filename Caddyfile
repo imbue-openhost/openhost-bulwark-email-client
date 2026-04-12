@@ -1,4 +1,11 @@
 :4000 {
+	# Redirect / to auto-login if no session cookie
+	@root_no_session {
+		path /
+		not header Cookie *jmap_session*
+	}
+	redir @root_no_session /owner-login temporary
+
 	# Owner auto-login via session API
 	handle /owner-login {
 		reverse_proxy localhost:3001
