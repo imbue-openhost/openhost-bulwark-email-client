@@ -1,6 +1,7 @@
 :4000 {
 	# Redirect root to auto-login
-	redir / /owner-login temporary
+	@root path /
+	redir @root /owner-login temporary
 
 	# Serve auto-login page for the owner
 	handle /owner-login {
