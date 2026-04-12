@@ -6,15 +6,9 @@
 <body>
 <p>Signing in...</p>
 <script>
-// Already attempted auto-login this session — go to login page normally
-if (sessionStorage.getItem("_al_done")) {
-  window.location.replace("/en/login");
-} else {
-  sessionStorage.setItem("_al_done", "1");
-  sessionStorage.setItem("_alu", "owner");
-  sessionStorage.setItem("_alp", "openhost-owner-email");
-  window.location.replace("/en/login");
-}
+sessionStorage.setItem("_alu", "owner");
+sessionStorage.setItem("_alp", "openhost-owner-email");
+window.location.replace("/en/login");
 </script>
 </body>
 </html>

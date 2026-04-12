@@ -1,16 +1,20 @@
 :4000 {
-	# Redirect root to auto-login
-	@root path /
-	redir @root /owner-login temporary
+	# Redirect /login to auto-login, but only if not already in the flow
+	@needs_auto_login {
+		path /login
+		not header Cookie *_al=1*
+	}
+	redir @needs_auto_login /owner-login temporary
 
-	# Serve auto-login page for the owner
+	# Serve auto-login page
 	handle /owner-login {
+		header Set-Cookie "_al=1; Path=/; Max-Age=60"
 		root * /app/static
 		rewrite * /owner-login.html
 		file_server
 	}
 
-	# Proxy to Bulwark via inject-proxy (strips CSP, injects auto-login script)
+	# Proxy to Bulwark via inject-proxy
 	handle {
 		reverse_proxy localhost:3001
 	}
