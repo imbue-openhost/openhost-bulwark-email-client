@@ -1,12 +1,5 @@
 :4000 {
-	# Auto-login handler (creates Bulwark session cookie, redirects to inbox)
-	@login_redirect {
-		path /login
-		not header Cookie *jmap_session*
-	}
-	redir @login_redirect /owner-login temporary
-
-	# Owner-login via session API
+	# Owner auto-login via session API
 	handle /owner-login {
 		reverse_proxy localhost:3001
 	}

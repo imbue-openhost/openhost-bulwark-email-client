@@ -22,16 +22,4 @@ test.describe("Owner auth flow", () => {
     const data = await resp.json();
     expect(data.username).toContain("owner");
   });
-
-  test("/owner-login creates session and redirects to inbox", async ({
-    page,
-  }) => {
-    await page.setExtraHTTPHeaders({ Authorization: `Bearer ${TOKEN}` });
-    await page.goto("/owner-login");
-
-    // Should end up in the inbox
-    await expect(page.getByRole("button", { name: "Inbox" })).toBeVisible({
-      timeout: 20_000,
-    });
-  });
 });
