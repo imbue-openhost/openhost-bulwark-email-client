@@ -15,9 +15,13 @@ const SCRIPT = `<script>
     var pw=document.getElementById("password");
     if(!e||!pw)return;
     clearInterval(iv);
-    var s=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
-    s.call(e,u);e.dispatchEvent(new Event("input",{bubbles:true}));
-    s.call(pw,p);pw.dispatchEvent(new Event("input",{bubbles:true}));
+    function fill(el,val){
+      el.focus();
+      el.value="";
+      document.execCommand("insertText",false,val);
+    }
+    fill(e,u);
+    fill(pw,p);
     setTimeout(function(){
       var b=document.querySelector('button[type="submit"]');
       if(b)b.click();
