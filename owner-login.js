@@ -5,7 +5,7 @@
 // Listens on :3001, proxied by Caddy on :4000.
 const http = require("http");
 
-const JMAP_SERVER = process.env.JMAP_SERVER_URL || "https://email.host.zackpolizzi.com";
+const JMAP_SERVER = process.env.JMAP_SERVER_URL || "https://stalwart-email-server.host.zackpolizzi.com";
 const JMAP_USER = process.env.OWNER_EMAIL_USER || "owner";
 const JMAP_PASS = process.env.OWNER_EMAIL_PASSWORD || "openhost-owner-email";
 
