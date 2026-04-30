@@ -11,6 +11,12 @@
 		reverse_proxy localhost:3001
 	}
 
+	# JMAP consumer proxy: strips /jmap-proxy prefix, forwards to sidecar
+	# which translates into v2 service proxy calls.
+	handle_path /jmap-proxy/* {
+		reverse_proxy localhost:3002
+	}
+
 	# Everything else to Bulwark
 	handle {
 		reverse_proxy localhost:3000

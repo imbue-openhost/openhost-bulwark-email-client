@@ -5,9 +5,16 @@
 // Listens on :3001, proxied by Caddy on :4000.
 const http = require("http");
 
-const JMAP_SERVER = process.env.JMAP_SERVER_URL || "https://stalwart-email-server.host.zackpolizzi.com";
+const APP_NAME = process.env.OPENHOST_APP_NAME || "webmail";
+const ZONE_DOMAIN = process.env.OPENHOST_ZONE_DOMAIN || "host.zackpolizzi.com";
 const JMAP_USER = process.env.OWNER_EMAIL_USER || "owner";
 const JMAP_PASS = process.env.OWNER_EMAIL_PASSWORD || "openhost-owner-email";
+
+// Server-side: Bulwark validates creds against this URL (hits localhost Caddy -> sidecar -> service proxy).
+// The sidecar injects owner auth, so the password here is just a placeholder that gets stripped.
+const LOCAL_JMAP = "http://localhost:4000/jmap-proxy";
+// Browser-side: the JMAP client in the browser uses this URL (goes through openhost router with owner cookie).
+const PUBLIC_JMAP = `https://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy`;
 
 const PAGE = `<!DOCTYPE html>
 <html>
@@ -18,26 +25,27 @@ const PAGE = `<!DOCTYPE html>
 <p>Signing in...</p>
 <script>
 (async function(){
-  var serverUrl=${JSON.stringify(JMAP_SERVER)};
+  var localServerUrl=${JSON.stringify(LOCAL_JMAP)};
+  var publicServerUrl=${JSON.stringify(PUBLIC_JMAP)};
   var username=${JSON.stringify(JMAP_USER)};
   var password=${JSON.stringify(JMAP_PASS)};
-  var accountId=username+"@"+serverUrl.replace("https://","");
+  var accountId=username+"@"+publicServerUrl.replace("https://","");
 
   try {
     var r=await fetch("/api/auth/session?slot=0",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({serverUrl:serverUrl,username:username,password:password,slot:0})
+      body:JSON.stringify({serverUrl:localServerUrl,username:username,password:password,slot:0})
     });
     if(!r.ok) throw new Error("session API: "+r.status);
 
     localStorage.setItem("auth-storage",JSON.stringify({
-      state:{serverUrl:serverUrl,username:username,authMode:"basic",
+      state:{serverUrl:publicServerUrl,username:username,authMode:"basic",
              rememberMe:true,isAuthenticated:true,activeAccountId:accountId},
       version:0
     }));
     localStorage.setItem("account-registry",JSON.stringify({
-      state:{accounts:[{label:username,serverUrl:serverUrl,username:username,
+      state:{accounts:[{label:username,serverUrl:publicServerUrl,username:username,
              authMode:"basic",rememberMe:true,displayName:username,email:username,
              lastLoginAt:Date.now(),isConnected:true,hasError:false,isDefault:true,
              id:accountId,cookieSlot:0,avatarColor:"#3b82f6"}],
