@@ -7,6 +7,8 @@ USER nextjs
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV SESSION_SECRET=openhost-bulwark-session-secret-key-do-not-share
+ENV JMAP_SERVER_URL=http://localhost:4000/jmap-proxy
+ENV ALLOW_CUSTOM_JMAP_ENDPOINT=true
 
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY owner-login.js /app/owner-login.js
