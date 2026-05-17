@@ -9,6 +9,7 @@ ENV PORT=3000
 ENV SESSION_SECRET=openhost-bulwark-session-secret-key-do-not-share
 ENV JMAP_SERVER_URL=http://localhost:4000/jmap-proxy
 ENV ALLOW_CUSTOM_JMAP_ENDPOINT=true
+ENV OWNER_EMAIL_ACCOUNTS='[{"user":"owner","password":"openhost-owner-email"},{"user":"me","password":"openhost-owner-email"}]'
 
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY owner-login.js /app/owner-login.js
