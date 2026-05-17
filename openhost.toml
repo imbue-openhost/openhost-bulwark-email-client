@@ -17,6 +17,8 @@ cpu_millicores = 200
 [data]
 app_data = true
 
-[[permissions_v2]]
+[[services.v2.consumes]]
 service = "github.com/imbue-openhost/openhost-stalwart-email-server/services/jmap"
+shortname = "jmap"
+version = ">=0.1.0"
 grants = [{key = "jmap:full_access"}]

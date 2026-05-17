@@ -13,13 +13,13 @@ const APP_TOKEN = process.env.OPENHOST_APP_TOKEN || "";
 const APP_NAME = process.env.OPENHOST_APP_NAME || "webmail";
 const ZONE_DOMAIN = process.env.OPENHOST_ZONE_DOMAIN || "host.zackpolizzi.com";
 
-const SERVICE_URL = "github.com/imbue-openhost/openhost-stalwart-email-server/services/jmap";
-const SERVICE_VERSION = ">=0.1.0";
+const SHORTNAME = "jmap";
 
 const PUBLIC_BASE = `https://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy`;
 const PUBLIC_WS_BASE = `wss://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy`;
 
-const SERVICE_PROXY_URL = `${ROUTER_URL}/_services_v2/service_request`;
+const routerParsed = new URL(ROUTER_URL);
+const SERVICE_CALL_PREFIX = `/api/services/v2/call/${SHORTNAME}`;
 
 function rewriteSessionUrls(body) {
   // Replace https://any-host/jmap with our public proxy base
@@ -32,31 +32,20 @@ function rewriteSessionUrls(body) {
 const server = http.createServer(async (req, res) => {
   const endpoint = req.url || "/";
 
-  // Build headers for the router's service proxy
-  const headers = {
-    "Authorization": `Bearer ${APP_TOKEN}`,
-    "X-OpenHost-Service-URL": SERVICE_URL,
-    "X-OpenHost-Service-Version": SERVICE_VERSION,
-    "X-OpenHost-Service-Endpoint": endpoint,
-  };
-
-  // Forward content-type if present
-  if (req.headers["content-type"]) {
-    headers["Content-Type"] = req.headers["content-type"];
-  }
-  if (req.headers["accept"]) {
-    headers["Accept"] = req.headers["accept"];
-  }
+  const headers = { ...req.headers };
+  delete headers.host;
+  delete headers["content-length"];
+  headers["Authorization"] = `Bearer ${APP_TOKEN}`;
 
   const isSession = endpoint === "/.well-known/jmap";
-  const proxyUrl = new URL(SERVICE_PROXY_URL);
+  const targetPath = SERVICE_CALL_PREFIX + (endpoint.startsWith("/") ? endpoint : "/" + endpoint);
 
   const proxyReq = http.request(
     {
-      hostname: proxyUrl.hostname,
-      port: proxyUrl.port,
-      path: proxyUrl.pathname,
-      method: req.method === "GET" || req.method === "HEAD" ? "GET" : "POST",
+      hostname: routerParsed.hostname,
+      port: routerParsed.port,
+      path: targetPath,
+      method: req.method,
       headers: headers,
     },
     (proxyRes) => {
