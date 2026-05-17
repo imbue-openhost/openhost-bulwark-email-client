@@ -15,8 +15,11 @@ const ZONE_DOMAIN = process.env.OPENHOST_ZONE_DOMAIN || "host.zackpolizzi.com";
 
 const SHORTNAME = "jmap";
 
-const PUBLIC_BASE = `https://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy`;
-const PUBLIC_WS_BASE = `wss://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy`;
+// Keep the `/jmap` suffix in rewritten URLs so the router's
+// /api/services/v2/call/<shortname>/<path:rest> route always sees a non-empty
+// rest (apiUrl '/jmap/' would otherwise collapse to empty rest and 404).
+const PUBLIC_BASE = `https://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy/jmap`;
+const PUBLIC_WS_BASE = `wss://${APP_NAME}.${ZONE_DOMAIN}/jmap-proxy/jmap`;
 
 const routerParsed = new URL(ROUTER_URL);
 const SERVICE_CALL_PREFIX = `/api/services/v2/call/${SHORTNAME}`;
